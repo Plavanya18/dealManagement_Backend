@@ -40,7 +40,7 @@ const createUser = async (data) => {
         email: data.email,
         password: hashedPassword,
         role_id: data.role_id,
-        branch: data.branch,
+        branch_id: data.branch_id,
         is_active: true,
         must_change_password: true,
         created_at: timestamp,
@@ -107,6 +107,20 @@ const listUsers = async (page = 1, limit = 10, search = "", orderByField = "crea
 
     const users = await getdb.user.findMany({
       where,
+      include:{
+        role:{
+          select:{
+            id: true,
+            name: true,
+          }
+        },
+        branch: {
+          select: {
+            id: true,
+            name: true,
+          }
+        },
+      },
       skip,
       take: limit,
       orderBy: { [orderByField]: orderDirection },
@@ -136,13 +150,19 @@ const getUserById = async (id) => {
     const user = await getdb.user.findUnique({
       where: { id: parseInt(id) },
       include: {
-        userDetail: true,
         role:{
           select:{
             id: true,
             name: true
         }
         },
+        branch: {
+          select: {
+            id: true,
+            name: true,
+          }
+        },
+        userDetail: true,
         sessions: {
           orderBy: { login_time: "desc" },
           take: 1,

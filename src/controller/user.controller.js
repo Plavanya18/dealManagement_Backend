@@ -12,7 +12,7 @@ const createUserController = async (req, res) => {
         full_name: user.full_name,
         email: user.email,
         role_id: user.role_id,
-        branch: user.branch,
+        branch_id: user.branch_id,
       },
     });
 
