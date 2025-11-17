@@ -62,13 +62,23 @@ model RolePermission {
   permission    Permission  @relation(fields: [permission_id], references: [id])
 }
 
+model Branch {
+  id              Int           @id @default(autoincrement())
+  name            String        @unique
+  is_active       Boolean       @default(true)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  users  User[]
+  deals  Deal[]
+}
+
 model User {
   id                      Int             @id @default(autoincrement())
   full_name               String
   email                   String          @unique
   password                String
   role_id                 Int?
-  branch                  String?
+  branch_id               Int?
   is_active               Boolean
   must_change_password    Boolean
   password_last_changed   DateTime?
@@ -81,6 +91,7 @@ model User {
   created_at              DateTime
   updated_at              DateTime
   deleted_at              DateTime?
+  branch                  Branch?         @relation(fields: [branch_id], references: [id])
   role                    Role?           @relation(fields: [role_id], references: [id])
   deactivatedBy           User?           @relation("UserDeactivatedBy", fields: [deactivated_by], references: [id])
   deactivatedUsers        User[]          @relation("UserDeactivatedBy")
@@ -272,6 +283,7 @@ model Deal {
   deal_type        DealType
   base_currency_id Int
   quote_currency_id Int
+  branch_id         Int?
   amount           Decimal
   rate             Decimal
   deal_date        DateTime
@@ -288,6 +300,7 @@ model Deal {
   printed_at       DateTime?
   download_count   Int          @default(0)
   print_count      Int          @default(0)
+  branch    Branch? @relation(fields: [branch_id], references: [id])
 
   status           DealStatus   @relation(fields: [status_id], references: [id])
   customer         Customer     @relation(fields: [customer_id], references: [id])

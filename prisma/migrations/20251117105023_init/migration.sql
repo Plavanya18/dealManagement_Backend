@@ -32,13 +32,25 @@ CREATE TABLE `RolePermission` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Branch` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT true,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `Branch_name_key`(`name`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `full_name` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `role_id` INTEGER NULL,
-    `branch` VARCHAR(191) NULL,
+    `branch_id` INTEGER NULL,
     `is_active` BOOLEAN NOT NULL,
     `must_change_password` BOOLEAN NOT NULL,
     `password_last_changed` DATETIME(3) NULL,
@@ -228,6 +240,7 @@ CREATE TABLE `Deal` (
     `deal_type` ENUM('buy', 'sell') NOT NULL,
     `base_currency_id` INTEGER NOT NULL,
     `quote_currency_id` INTEGER NOT NULL,
+    `branch_id` INTEGER NULL,
     `amount` DECIMAL(65, 30) NOT NULL,
     `rate` DECIMAL(65, 30) NOT NULL,
     `deal_date` DATETIME(3) NOT NULL,
@@ -284,6 +297,22 @@ CREATE TABLE `Payment` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `DealDocument` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `deal_id` INTEGER NOT NULL,
+    `file_name` VARCHAR(191) NOT NULL,
+    `file_path` VARCHAR(191) NOT NULL,
+    `mime_type` VARCHAR(191) NULL,
+    `uploaded_by` INTEGER NULL,
+    `uploaded_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `whatsapp_sent` BOOLEAN NOT NULL DEFAULT false,
+    `email_sent` BOOLEAN NOT NULL DEFAULT false,
+    `notification_at` DATETIME(3) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `FxRate` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `base_currency_id` INTEGER NOT NULL,
@@ -332,6 +361,9 @@ ALTER TABLE `RolePermission` ADD CONSTRAINT `RolePermission_role_id_fkey` FOREIG
 
 -- AddForeignKey
 ALTER TABLE `RolePermission` ADD CONSTRAINT `RolePermission_permission_id_fkey` FOREIGN KEY (`permission_id`) REFERENCES `Permission`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `User` ADD CONSTRAINT `User_branch_id_fkey` FOREIGN KEY (`branch_id`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `User` ADD CONSTRAINT `User_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `Role`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -385,6 +417,9 @@ ALTER TABLE `CustomerBank` ADD CONSTRAINT `CustomerBank_deleted_by_fkey` FOREIGN
 ALTER TABLE `SystemBank` ADD CONSTRAINT `SystemBank_created_by_fkey` FOREIGN KEY (`created_by`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Deal` ADD CONSTRAINT `Deal_branch_id_fkey` FOREIGN KEY (`branch_id`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Deal` ADD CONSTRAINT `Deal_status_id_fkey` FOREIGN KEY (`status_id`) REFERENCES `DealStatus`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -422,6 +457,12 @@ ALTER TABLE `Payment` ADD CONSTRAINT `Payment_processed_by_fkey` FOREIGN KEY (`p
 
 -- AddForeignKey
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_approved_by_fkey` FOREIGN KEY (`approved_by`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `DealDocument` ADD CONSTRAINT `DealDocument_deal_id_fkey` FOREIGN KEY (`deal_id`) REFERENCES `Deal`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `DealDocument` ADD CONSTRAINT `DealDocument_uploaded_by_fkey` FOREIGN KEY (`uploaded_by`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `FxRate` ADD CONSTRAINT `FxRate_base_currency_id_fkey` FOREIGN KEY (`base_currency_id`) REFERENCES `Currency`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
