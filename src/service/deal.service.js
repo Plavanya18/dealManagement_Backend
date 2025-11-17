@@ -13,6 +13,7 @@ const createDeal = async (data, userId) => {
     deal_type,
     base_currency_id,
     quote_currency_id,
+    branch_id,
     amount,
     rate,
     deal_date,
@@ -61,6 +62,7 @@ const createDeal = async (data, userId) => {
       deal_type,
       base_currency_id,
       quote_currency_id,
+      branch_id,
       amount,
       rate,
       deal_date,
@@ -76,6 +78,7 @@ const createDeal = async (data, userId) => {
       baseCurrency: true,
       quoteCurrency: true,
       customer: true,
+      branch: true,
     },
   });
 
@@ -254,6 +257,12 @@ const getAllDeals = async ({
           id: true,
           full_name: true
         }
+      },
+      branch: {
+        select: {
+          id: true,
+          name: true
+        }
       }
     },
     orderBy: { [orderByField]: orderDirection },
@@ -385,6 +394,12 @@ const getDealById = async (id, download_deal_slip = "false") => {
           id: true,
           full_name: true,
           email: true
+        }
+      },
+      branch: {
+        select: {
+          id: true,
+          name: true
         }
       },
       payments: {

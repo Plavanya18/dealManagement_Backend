@@ -10,7 +10,7 @@ const upload = multer({
 });
 
 // router.post("/send-otp", upload.any(), customerController.sendOtpForCustomerController);
-router.post("/", customerController.createCustomerController);
+router.post("/",upload.any(), customerController.createCustomerController);
 router.get("/", customerController.listCustomersController);                
 router.get("/:id", customerController.getCustomerByIdController);             
 router.put("/:id", customerController.updateCustomerController);             
