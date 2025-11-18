@@ -39,7 +39,6 @@ const loginUser = async (email, password) => {
       throw new Error("Your account is deactivated. Please contact admin.");
     }
 
-    // 🔹 If user was force-logged out previously, clear it now
     if (user.force_logout) {
       await getdb.user.update({
         where: { id: user.id },

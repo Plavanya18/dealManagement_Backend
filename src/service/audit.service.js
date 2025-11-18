@@ -1,58 +1,6 @@
 const { getdb } = require("../config/db");
 const logger = require("../config/logger");
 
-// const getAllActiveAuditLogs = async () => {
-//     try {
-//         const logs = await getdb.auditLog.findMany({
-//             where: { is_active: true },
-//             include: {
-//                 user: {
-//                     select: {
-//                         id: true,
-//                         full_name: true,
-//                         email: true,
-//                         role: {
-//                             select: {
-//                                 id: true,
-//                                 name: true
-//                             }
-//                         }
-//                     }
-//                 },
-//                 deal: { 
-//                     select: { 
-//                         id: true, 
-//                         deal_number: true, 
-//                         deal_type: true, 
-//                         remarks: true,
-//                         rate: true, 
-//                         amount: true, 
-//                         status:{
-//                             select:{
-//                                 id: true,
-//                                 name: true,
-//                             }
-//                         },
-//                         customer:{
-//                             select:{
-//                                 id: true,
-//                                 name: true,
-//                                 customer_type: true,
-//                             }
-//                         }
-//                     } 
-//                 },
-//             },
-//             orderBy: { created_at: "desc" },
-//         });
-
-//         return logs;
-//     } catch (error) {
-//         logger.error("Error fetching active audit logs:", error);
-//         throw error;
-//     }
-// };
-
 const getAllActiveAuditLogs = async ({
     page = 1,
     limit = 10,
