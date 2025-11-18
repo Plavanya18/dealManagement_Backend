@@ -111,7 +111,7 @@ const loginUser = async (email, password) => {
     const allowedIp = await getdb.ipAddress.findUnique({ where: { ip_address: currentIP } });
     if (!allowedIp) throw new Error("Access denied: IP not whitelisted");
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
     otpStore.set(email, {
       otp,
       ip_id: allowedIp.id,
