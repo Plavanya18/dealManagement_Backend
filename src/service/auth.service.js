@@ -4,19 +4,16 @@ const jwt = require("jsonwebtoken");
 const logger = require("../config/logger");
 const { sendEmail } = require("../utils/mailer");
 const axios = require("axios");
+const os = require("os");
 
 const otpStore = new Map();
 
-/**
- * Helper: get current machine's public IP
- */
-const getPublicIP = async () => {
-  try {
-    const res = await axios.get("https://api.ipify.org?format=json");
-    return res.data.ip;
-  } catch (error) {
-    logger.error("Failed to fetch system IP:", error);
-    throw new Error("Unable to verify system IP");
+const getLocalIP = () => {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === "IPv4" && !iface.internal) return iface.address;
+    }
   }
 };
 
@@ -106,7 +103,7 @@ const loginUser = async (email, password) => {
       };
     }
 
-    const currentIP = await getPublicIP();
+    const currentIP = await getLocalIP();
     console.log("currentIP", currentIP);
     const allowedIp = await getdb.ipAddress.findUnique({ where: { ip_address: currentIP } });
     if (!allowedIp) throw new Error("Access denied: IP not whitelisted");
