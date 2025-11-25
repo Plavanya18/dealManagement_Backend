@@ -5,6 +5,7 @@ const { sendEmail } = require("../utils/mailer");
 const ApiError = require("../utils/ApiError");
 const httpStatus = require("http-status");
 const crypto = require("crypto");
+const { date } = require("joi");
 
 
 const generatePassword = () => {
@@ -95,14 +96,18 @@ const listUsers = async (page = 1, limit = 10, search = "", orderByField = "crea
   try {
     const skip = (page - 1) * limit;
 
-    const where = search
-      ? {
-          OR: [
-            { full_name: { contains: search } },
-            { email: { contains: search} },
-          ],
-        }
-      : {};
+      const where = {
+      deleted_at: null,
+      ...(search
+        ? {
+            OR: [
+              { full_name: { contains: search } },
+              { email: { contains: search } },
+            ],
+          }
+        : {}),
+    };
+
 
     const totalUsers = await getdb.user.count({ where });
 
@@ -314,30 +319,33 @@ const deleteUser = async (id) => {
       throw new Error("User not found");
     }
 
-    const sessions = await getdb.userSession.findMany({
-      where: { user_id: userId },
-    });
+    // const sessions = await getdb.userSession.findMany({
+    //   where: { user_id: userId },
+    // });
 
-    if (sessions.length > 0) {
-      await getdb.userSession.deleteMany({
-        where: { user_id: userId },
-      });
-      logger.info(`Deleted ${sessions.length} session(s) for user ID ${userId}`);
-    }
+    // if (sessions.length > 0) {
+    //   await getdb.userSession.deleteMany({
+    //     where: { user_id: userId },
+    //   });
+    //   logger.info(`Deleted ${sessions.length} session(s) for user ID ${userId}`);
+    // }
 
-    const userDetail = await getdb.userDetail.findUnique({
-      where: { user_id: userId },
-    });
+    // const userDetail = await getdb.userDetail.findUnique({
+    //   where: { user_id: userId },
+    // });
 
-    if (userDetail) {
-      await getdb.userDetail.delete({
-        where: { user_id: userId },
-      });
-      logger.info(`UserDetail deleted for user ID ${userId}`);
-    }
+    // if (userDetail) {
+    //   await getdb.userDetail.delete({
+    //     where: { user_id: userId },
+    //   });
+    //   logger.info(`UserDetail deleted for user ID ${userId}`);
+    // }
 
-    const deletedUser = await getdb.user.delete({
+    const deletedUser = await getdb.user.update({
       where: { id: userId },
+      data: {
+        deleted_at: new Date(),
+      }
     });
 
     logger.info(`User deleted successfully: ${deletedUser.full_name}`);
