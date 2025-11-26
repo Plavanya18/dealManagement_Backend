@@ -286,7 +286,10 @@ const logoutUser = async (token) => {
 
   await getdb.userSession.update({
     where: { id: session.id },
-    data: { logout_time: new Date() },
+    data: { logout_time: new Date() ,
+      updated_at: new Date(),
+      session_status: "inactive",
+    },
   });
 
   const deletedDeals = await getdb.deal.updateMany({

@@ -39,7 +39,7 @@ const verifyToken = async (req, res, next) => {
     const session = await getdb.userSession.findFirst({ where: { token } });
     if (!session) return res.status(401).json({ message: "Session not found" });
 
-    if (session.logout_time || session.session_status === "terminated") {
+    if (session.logout_time || session.session_status === "terminated" || session.session_status === "timeout" || session.session_status === "inactive") {
       return res.status(401).json({ message: "Session already logged out" });
     }
 
@@ -50,7 +50,7 @@ const verifyToken = async (req, res, next) => {
     if (inactiveFor > INACTIVITY_TIMEOUT_MS) {
       await getdb.userSession.update({
         where: { id: session.id },
-        data: { session_status: "inactive", updated_at: now },
+        data: { session_status: "timeout", updated_at: now },
       });
 
       return res.status(401).json({
