@@ -299,6 +299,19 @@ const getCustomerById = async (id) => {
   const customer = await getdb.customer.findUnique({
     where: { id: customerId },
     include: {
+      createdBy: { 
+        select: { 
+          id: true, 
+          full_name: true, 
+          email: true,
+          role:{
+            select:{
+              name: true
+            }
+          } 
+        } 
+      },
+      
       kycDocuments: {
         include: {
           uploadedBy: { 
@@ -328,6 +341,15 @@ const getCustomerById = async (id) => {
         where: { 
           deleted_at: null 
         },
+        include:{
+          currency:{
+              select:{
+                code: true,
+                country: true,
+                name: true,
+              }
+            }
+        }
       },
       deals: {
         where: { 
