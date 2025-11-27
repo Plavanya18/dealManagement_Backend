@@ -308,10 +308,16 @@ const getCustomerById = async (id) => {
             select:{
               name: true
             }
-          } 
+          }
         } 
       },
-      
+      deactivatedBy: {
+        select:{
+          id: true,
+          full_name: true,
+          email: true
+        }
+      },
       kycDocuments: {
         include: {
           uploadedBy: { 
